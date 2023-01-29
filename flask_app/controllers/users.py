@@ -150,7 +150,7 @@ def leaderboard():
     result = User.update_score(data)
     print(result)
     user_list = User.get_all_users()
-    return render_template("dashboard.html",users_list=user_list)
+    return render_template("leaderboard.html",users_list=user_list)
 
 # Route to Logout
 @app.route("/logout")
