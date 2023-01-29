@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <title>Wordlle</title>
+</head>
+<body>
+    <p>Random Word = {{word}}</p>
+    <form action="/validate" method="post">
+        <input type="hidden" value = {{word}} name="word">
+        <div>
+            <input type="text" size="1" name="first" style="background-color: {{box_list[0]}};" value="{{user_entry['first']}}">
+            <input type="text" size="1" name="second" style="background-color: {{box_list[1]}};" value="{{user_entry['second']}}">
+            <input type="text" size="1" name="third" style="background-color: {{box_list[2]}};" value="{{user_entry['third']}}">
+            <input type="text" size="1" name="fourth" style="background-color: {{box_list[3]}};" value="{{user_entry['fourth']}}">
+            <input type="text" size="1" name="fifth" style="background-color: {{box_list[4]}};" value="{{user_entry['fifth']}}">
+        </div>
+        <div>
+            {% if (session['attempt'] < 6) %}
+                <input type="submit" value="Enter">
+            {% endif %}
+            <input type="submit" value="Play Another" formaction="/another">
+        </div>
+    </form>
+    <div>
+        <h2>Score = {{session['score']}}</h2>
+    </div>
+    <div>
+        <p>Number of tries - {{session['attempt']}} </p>
+    </div>
+    <div>
+        <p>Words Tried</p>
+        <ul>
+            {% for each_word in word_list %}
+                <li>{{each_word}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <a href="/logout">Logout</a>
+    </div>
+</body>
+</html>
