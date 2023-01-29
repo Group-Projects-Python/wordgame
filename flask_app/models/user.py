@@ -44,10 +44,20 @@ class User:
         return all_users
     
     @classmethod
+    def update_users(cls, data):
+        query = 'UPDATE users SET firstName=%(first_name)s, lastName=%(last_name)s, email=%(email)s, password=%(password)s WHERE id = %(id)s;'
+        return connectToMySQL(cls.db).query_db(query,data)
+    
+    @classmethod
     def update_score(cls,data):
         query = "UPDATE users SET score=%(score)s WHERE id=%(id)s;"
         result = connectToMySQL(DB).query_db(query,data)
         return result
+    
+    @classmethod
+    def delete_users(cls, data):
+        query = 'DELETE FROM users WHERE id = %(id)s;'
+        return connectToMySQL(cls.db).query_db(query,data)
     
     @staticmethod
     def validate_registration(user):
