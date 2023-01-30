@@ -29,6 +29,12 @@ class User:
         return cls(results[0])
     
     @classmethod
+    def get_user_by_id(cls,data):
+        query = "SELECT * FROM users WHERE id = %(id)s;"
+        results = connectToMySQL(cls.db).query_db(query,data)
+        return cls(results[0])
+    
+    @classmethod
     def add_user(cls,data):
         query = "INSERT INTO users (first_name,last_name,email,password,created_at,updated_at) VALUES (%(first_name)s,%(last_name)s,%(email)s,%(password)s,NOW(),NOW());"
         results = connectToMySQL(DB).query_db(query,data)
@@ -44,7 +50,7 @@ class User:
         return all_users
     
     @classmethod
-    def update_users(cls, data):
+    def update_user(cls, data):
         query = 'UPDATE users SET firstName=%(first_name)s, lastName=%(last_name)s, email=%(email)s, password=%(password)s WHERE id = %(id)s;'
         return connectToMySQL(cls.db).query_db(query,data)
     
@@ -55,7 +61,7 @@ class User:
         return result
     
     @classmethod
-    def delete_users(cls, data):
+    def delete_user(cls, data):
         query = 'DELETE FROM users WHERE id = %(id)s;'
         return connectToMySQL(cls.db).query_db(query,data)
     
