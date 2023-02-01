@@ -1,45 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
-    <title>Wordlle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WORDLE RELOADED</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/wordle.css')}}" />
+    <link rel="stylesheet" type="text/css" href="../static/css/wordle.css">
 </head>
 <body>
-    <p>Random Word = {{word}}</p>
-    <form action="/validate" method="post">
-        <input type="hidden" value = {{word}} name="word">
-        <div>
-            <input type="text" size="1" name="first" style="background-color: {{box_list[0]}};" value="{{user_entry['first']}}">
-            <input type="text" size="1" name="second" style="background-color: {{box_list[1]}};" value="{{user_entry['second']}}">
-            <input type="text" size="1" name="third" style="background-color: {{box_list[2]}};" value="{{user_entry['third']}}">
-            <input type="text" size="1" name="fourth" style="background-color: {{box_list[3]}};" value="{{user_entry['fourth']}}">
-            <input type="text" size="1" name="fifth" style="background-color: {{box_list[4]}};" value="{{user_entry['fifth']}}">
+    <div class="container-fluid">
+        <div class="topnav">
+            <img src="../static/images/wordleicon.png" alt="wordle" class="wordle-icons m-2"><h1 class="fs-1">WORDLE<span class="titlehalf">RELOADED</span></h1>
         </div>
-        <div>
-            {% if (session['attempt'] < 6) %}
-                <input type="submit" value="Enter">
-            {% endif %}
-            <input type="submit" value="Play Another" formaction="/another">
+        <div class="d-flex mt-3">
+            <div class="col">
+                <h2>Welcome {{session['user_name']}}</h2>
+            </div>
+            <div class="col menu-container">
+                <div>
+                    <a href="/logout" class="btn" role="button"><img src="../static/images/logout.jpg" alt="Logout" height="50px"></a>
+                </div>
+            </div>
         </div>
-    </form>
-    <div>
-        <h2>Score = {{session['score']}}</h2>
-    </div>
-    <div>
-        <p>Number of tries - {{session['attempt']}} </p>
-    </div>
-    <div>
-        <p>Words Tried</p>
-        <ul>
-            {% for each_word in word_list %}
-                <li>{{each_word}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div>
-        <a href="/logout">Logout</a>
+        <div class="main-container">
+            <div class="left-column">
+                <div class="d-flex">
+                    <div class="col">
+                        <h3 class="text-center">Wordle</h3>
+                    </div>
+                    <div class="col">
+                        <h4>Score = {{session['score']}}</h4>
+                    </div>
+                </div>
+                <div>
+                    <form action="/validate" method="post" class="d-grid">
+                        <div>
+                            <input type="hidden" value = {{word}} name="word">
+                            <div style="margin-left: 2rem;">
+                                <input type="text" size="1" name="first" maxlength="1" class="b1 text-center text-white" style="background-color: {{box_list[0]}};" value="{{user_entry['first']}}">
+                            </div>
+                            <div>
+                                <input type="text" size="1" name="second" maxlength="1" class="b2 text-center text-white" style="background-color: {{box_list[1]}};" value="{{user_entry['second']}}">
+                            </div>
+                            <div>
+                                <input type="text" size="1" name="third" maxlength="1" class="b3 text-center text-white" style="background-color: {{box_list[2]}};" value="{{user_entry['third']}}">
+                            </div>
+                            <div>
+                                <input type="text" size="1" name="fourth" maxlength="1" class="b4 text-center text-white" style="background-color: {{box_list[3]}};" value="{{user_entry['fourth']}}">
+                            </div>
+                            <div>
+                                <input type="text" size="1" name="fifth" maxlength="1" class="b4 text-center text-white" style="background-color: {{box_list[4]}};" value="{{user_entry['fifth']}}">
+                            </div>
+                        </div>
+                        <div>
+                            {% if (session['attempt'] < 6) %}
+                            <div class="container mg-left1">
+                                <input type="submit" value="Check" class="btn btn-dark">
+                                <input type="submit" value="Try a New Word" formaction="/another" class="btn btn-dark">
+                            </div>
+                            {% else %}
+                            <div class="alert alert-danger">
+                                <strong>Sorry!</strong> You used all your attempts. Correct word is <strong> {{session['random_word']}} </strong>
+                            </div>
+                            <div class="container mg-left">
+                                <input type="submit" value="Play Again" formaction="/another" class="btn btn-dark">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="right-column">
+                <h4> Attempts - {{session['attempt']}} </h4>
+                <h4> Guessed Words</h4>
+                <div class="right-topbox">
+                    <table>
+                        {% for each_word in word_list %}
+                            <tr> 
+                                <td>{{each_word}}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
+<footer class="footer">
+    <div class="text-muted">
+        <p class="text-center">Wordle Reloaded</p>
+    </div>
+</footer>
 </html>
