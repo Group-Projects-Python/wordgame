@@ -1,5 +1,4 @@
-# Login Registration Assignment
-# Author: Vignesh Manickam
+# Wordle Reloaded Project
 
 from flask_app.config.mysqlconnection import connectToMySQL
 from flask import flash
@@ -30,7 +29,7 @@ class User:
     
     @classmethod
     def add_user(cls,data):
-        query = "INSERT INTO users (first_name,last_name,email,password,created_at,updated_at) VALUES (%(first_name)s,%(last_name)s,%(email)s,%(password)s,NOW(),NOW());"
+        query = "INSERT INTO users (first_name,last_name,email,password,score,created_at,updated_at) VALUES (%(first_name)s,%(last_name)s,%(email)s,%(password)s,0,NOW(),NOW());"
         results = connectToMySQL(DB).query_db(query,data)
         return results
     
@@ -49,6 +48,39 @@ class User:
         result = connectToMySQL(DB).query_db(query,data)
         return result
     
+    @classmethod
+    def get_score_by_id(cls,id):
+        data = {
+            "id":id
+        }
+        query = "SELECT score FROM users WHERE id=%(id)s;"
+        result = connectToMySQL(DB).query_db(query,data)
+        print("Get Score by ID method = ",result[0])
+        return result[0]
+    
+    @classmethod
+    def get_user_by_id(cls,data):
+        query = "SELECT * FROM users WHERE id=%(id)s;"
+        result = connectToMySQL(DB).query_db(query,data)
+        print("Get user by ID method = ",result[0])
+        return cls(result[0])
+
+    @classmethod
+    def update_user(cls,data):
+        query = "UPDATE users SET first_name=%(first_name)s,last_name=%(last_name)s,password=%(password)s WHERE id=%(id)s;"
+        result = connectToMySQL(DB).query_db(query,data)
+        print("Update result = ",result)
+        return result
+
+    @classmethod
+    def delete_user(cls,id):
+        data = {
+            "id":id
+        }
+        query = "DELETE FROM users WHERE id=%(id)s;"
+        result = connectToMySQL(DB).query_db(query,data)
+        return result
+
     @staticmethod
     def validate_registration(user):
         is_valid = True

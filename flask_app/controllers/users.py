@@ -1,5 +1,4 @@
-# Login Registration Assignment
-# Author: Vignesh Manickam
+# Wordle Reloaded Project
 
 from flask_app import app
 from flask import render_template,request,redirect,session,flash
@@ -13,7 +12,17 @@ words_tried=[]
 # Base Route
 @app.route("/")
 def base():
+    return render_template("welcome.html")
+
+# Sign-in Route
+@app.route("/signin")
+def signin():
     return render_template("login.html")
+
+# Registration Route
+@app.route("/add-account")
+def account():
+    return render_template("register.html")
 
 # User Registration Route
 @app.route("/register",methods=['POST'])
@@ -32,7 +41,7 @@ def register():
         session['user_name'] = data['first_name']
         session['user_id'] = result
     else :
-        return redirect("/")
+        return redirect("/add-account")
     return redirect("/dashboard")
 
 # Login Route
@@ -48,17 +57,17 @@ def login():
         user_detail = User.get_user_by_email(data['email'])
         if not user_detail:
             flash("invalid email","login")
-            return redirect('/')
+            return redirect('/signin')
         if not bcrypt.check_password_hash(user_detail.password,request.form['password']):
             print("inside pwd check validation")
             flash("wrong password","login")
-            return redirect('/')
+            return redirect('/signin')
         session['user_name'] = user_detail.first_name
         session['user_id'] = user_detail.id
         print("Returing dashboard")
         return redirect('/dashboard')
     else:
-        return redirect('/')
+        return redirect('/signin')
 
 # Dashboard Route
 @app.route("/dashboard")
@@ -71,6 +80,7 @@ def home():
         print(response.json())
         data = response.json()
         print(data[0])
+        session['random_word']=data[0]
         return render_template("home.html",word=data[0])
     else :
         return redirect('/')
@@ -106,7 +116,7 @@ def validate():
     # On Success Route to Dashboard
     if (user_word == word_random):
         print("Success")
-        return redirect('/leaderboard')
+        return redirect('/update-score')
     else :
         if session['attempt'] == 6 :
             pass # Write a flask message of correct word.
@@ -115,7 +125,7 @@ def validate():
         session['score'] = session['score'] - 50
         if (len(word_random) == len(user_word)) :
             for i in range(len(user_word)) :
-                print("Comparing",word_random[i],user_word[i])
+                #print("Comparing",word_random[i],user_word[i])
                 if (word_random[i] == user_word[i]):
                     #print("Green")
                     box_style.append("Green")
@@ -139,18 +149,85 @@ def play():
     print("After clear",len(words_tried))
     return redirect('/dashboard')
 
-# Leaderboard Route
-@app.route("/leaderboard")
-def leaderboard():
-    print("Inside Dashboard")
+# Update Score Route
+@app.route("/update-score")
+def update_score():
+    print("Inside update score")
+    score=0
+    existing_score  = User.get_score_by_id(session['user_id'])
+    print("Existing Score for the user = ",existing_score["score"])
+    if existing_score["score"] == " " :
+        print("inside the IF loop of score to assign 0")
+        existing_score["score"] = 0
+    if (existing_score["score"] != "" or existing_score["score"] != None) :
+        print("inside the IF loop")
+        score = existing_score["score"] + session['score']
+    else :
+        score = session['score']
+    print("Updated Score = ",score)
     data = {
         "id":session['user_id'],
-        "score":session['score']
+        "score":score
     }
     result = User.update_score(data)
     print(result)
+    return redirect('/leaderboard')
+
+# Leaderboard Route
+@app.route("/leaderboard")
+def leaderboard():
+    print("Inside Leaderboard")
     user_list = User.get_all_users()
-    return render_template("dashboard.html",users_list=user_list)
+    return render_template("leaderboard.html",users_list=user_list)
+
+# Play Again
+@app.route("/again")
+def again():
+    print(len(words_tried))
+    # Clearing the words tried array, as it was a new word guess
+    words_tried.clear()
+    print("After clear",len(words_tried))
+    return redirect('/dashboard')
+
+# Edit Route for the User Profile
+@app.route("/edit")
+def edit():
+    print("Inside the Edit profile Route")
+    if 'user_id'  not in session :
+        return redirect('/')
+    else :
+        data = {
+            "id" : session['user_id']
+        }
+        theUser = User.get_user_by_id(data)
+    return render_template("edit.html",user = theUser)
+
+# Update the User Profile
+@app.route("/update",methods=['POST'])
+def update_user():
+    data = {
+        "first_name" : request.form['first_name'],
+        "last_name" : request.form['last_name'],
+        "email" : request.form['email'],
+        "password" : request.form['password'],
+        "confirm_password" : request.form['password'],
+        "id":session['user_id']
+    }
+    if User.validate_registration :
+        data["password"] = bcrypt.generate_password_hash(request.form['password'])
+        result = User.update_user(data)
+
+    else :
+        return redirect('/edit')
+    return redirect('/leaderboard')
+
+# Delete Route for the user account
+@app.route("/delete")
+def delete():
+    print("Delete Route")
+    result = User.delete_user(session['user_id'])
+    print("Delete User Result = ",result)
+    return redirect('/')
 
 # Route to Logout
 @app.route("/logout")
